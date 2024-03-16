@@ -1,0 +1,399 @@
+openapi: 3.0.3
+info:
+  title: Meraki API
+  description: Meraki Backend API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000
+tags:
+  - name: index
+    description: Hello World
+  - name: user
+    description: User management
+  - name: pokemon
+    description: Pokemon management
+  - name: favorites
+    description: Favorites management
+paths:
+  /:
+    get:
+      tags:
+        - index
+      summary: Hello World
+      description: Hello World
+      operationId: helloWorld
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: Login
+      description: Login to the application
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginSchemaDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponseDTO' 
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /user/register:
+    post:
+      tags:
+        - user
+      summary: Register
+      description: Register to the application
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterSchemaDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponseDTO' 
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /pokemon:
+    post:
+      tags:
+        - pokemon
+      summary: Register Pokemon
+      description: Register a new pokemon
+      operationId: registerPokemon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PokemonRegisterSchemaDTO'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PokemonResponseDTO' 
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /pokemon/{userId}:
+    get:
+      tags:
+        - pokemon
+      summary: Get Pokemon
+      description: Get all pokemons from a user
+      operationId: getPokemon
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PokemonResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /favorites/{userId}:
+    get:
+      tags:
+        - favorites
+      summary: Get Favorites
+      description: Get all favorite pokemons from a user
+      operationId: getFavorites
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PokemonResponseDTO'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+  /favorites/{userId}/{pokemonId}:
+    put:
+      tags:
+        - favorites
+      summary: Add Favorite
+      description: Add a pokemon to favorites
+      operationId: addFavorite
+      parameters:
+        - name: pokemonId
+          in: path
+          required: true
+          description: Pokemon ID
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PokemonResponseDTO' 
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+    delete:
+      tags:
+        - favorites
+      summary: Remove Favorite
+      description: Remove a pokemon from favorites
+      operationId: removeFavorite
+      parameters:
+        - name: pokemonId
+          in: path
+          required: true
+          description: Pokemon ID
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PokemonResponseDTO' 
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorDTO'
+# SCHEMAS
+components:
+  schemas:
+    #LOGIN SCHEMA
+    LoginSchemaDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    LoginResponseDTO:
+      type: object
+      properties:
+        data:
+          type: string
+        messages:
+          type: array
+          items:
+            type: string
+        success:
+          type: boolean
+    #REGISTER SCHEMA
+    RegisterSchemaDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+        region:
+          type: string
+      required:
+        - username
+        - password
+        - region
+    RegisterResponseDTO:
+      type: object
+      properties:
+        data:
+          type: boolean
+        messages:
+          type: array
+          items:
+            type: string
+        success:
+          type: boolean
+    #POKEMON SCHEMA
+    PokemonRegisterSchemaDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        nickname:
+          type: string
+        level:
+          type: integer
+        userId:
+          type: string
+      required:
+        - name
+        - type
+        - nickname
+        - level
+        - userId
+    PokemonResponseDTO:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            uuid:
+              type: string
+            name:
+              type: string
+            type:
+              type: string
+            nickname:
+              type: string
+            level:
+              type: integer
+            userId:
+              type: string
+        messages:
+          type: array
+          items:
+            type: string
+        success:
+          type: boolean
+    #ERROR SCHEMA
+    ErrorDTO:
+      type: object
+      properties:
+        data:
+          type: object
+        messages:
+          type: array
+          items:
+            type: string
+        success:
+          type: boolean

@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  username String @unique
+  password String
+  region   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+
+  pokemons  Pokemon[]
+  favorites Favorites[]
+}
+
+model Pokemon {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  name      String
+  type      PokemonTypesEnum
+  nickname  String
+  level     Int
+  pokemonId Int           
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+
+  owner  User @relation(fields: [userId], references: [id])
+  userId Int
+
+  favorites Favorites[]
+}
+
+model Favorites {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+
+  pokemon   Pokemon @relation(fields: [pokemonId], references: [id])
+  pokemonId Int     @unique
+  owner     User    @relation(fields: [userId], references: [id])
+  userId    Int     @unique
+}
+
+model PokemonTypes {
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(uuid())
+
+  name String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isActive  Boolean  @default(true)
+}
+
+enum PokemonTypesEnum {
+  NORMAL
+  FIRE
+  WATER
+  GRASS
+  ELECTRIC
+  ICE
+  FIGHTING
+  POISON
+  GROUND
+  FLYING
+  PSYCHIC
+  BUG
+  ROCK
+  GHOST
+  DARK
+  DRAGON
+  STEEL
+  FAIRY
+}
