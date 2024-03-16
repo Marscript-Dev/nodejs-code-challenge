@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY swagger.yaml ./
 COPY prisma ./prisma/
-
+COPY .env ./
 # Install app dependencies
 RUN npm install
 
@@ -21,6 +21,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/swagger.yaml ./
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/.env ./
 
 EXPOSE 4000
 CMD [ "npm", "run", "start" ]
