@@ -1,40 +1,38 @@
-// Importar Express y otras dependencias
 import express, { Request, Response } from 'express';
 import prisma from '../../prisma/db';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import * as UserService from '../services/UserService';
+import * as AuthService from '../services/AuthService';
+import * as Auth from '../middleware/Auth';
+
+//Models
+import {IUser}  from '../models/User';
 
 dotenv.config();
 
-const app = express();
-app.use(express.json());
-
-const JWT_SECRET = process.env.JWT_SECRET || 'mi_secreto_jwt';
-
-const authenticateToken = (req: Request, res: Response, next: () => void) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (token == null) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
-    if (err) return res.sendStatus(403);
-    //req.user = user;
-    next();
-  });
-};
+const app = express.Router();
 
 app.post('/register', async (req, res) => {
   const { username, lastname, email, password } = req.body;
+
+  if(username === undefined || lastname === undefined || email === undefined || password === undefined)
+  {
+    return res.status(400).json({ message:"Parámetros faltantes"});
+  }
+
   try {
-    const user = await prisma.user.create({
-      data: {
-        user_name: username,
-        user_lastname: lastname,
-        user_email: email,
-        user_password : password,
-      },
-    });
-    res.json(user);
+    const user : IUser =  {
+        user_id:        1,
+        user_name:      username,
+        user_lastname:  lastname,
+        user_email:     email,
+        user_password:  password,
+      };
+
+    const userAdded = await UserService.registerUser(user);
+
+    res.json(userAdded);
   } catch (error) {
     res.status(400).json({ message: 'Error al registrar el usuario' });
   }
@@ -42,17 +40,23 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const user = await prisma.user.findUnique({
-    where: { user_name : username },
-  });
-  if (!user || user.user_password !== password) {
+  if(username === undefined || password === undefined) {
+    return res.status(400).json({ message:"Parámetros faltantes"});
+  }
+
+  const user = await UserService.findUserByUsername(username);
+
+  const hashedPassword = await AuthService.hashPassword(password);
+  const isMatch = await AuthService.comparePasswords(password, hashedPassword);
+
+  if (!user || !isMatch) {
     return res.status(400).json({ message: 'Credenciales inválidas' });
   }
-  const accessToken = jwt.sign({ username }, JWT_SECRET);
+  const accessToken = Auth.getToken(user);
   res.json({ accessToken });
 });
 
-app.get('/user', authenticateToken, async (req, res) => {
+app.get('/user', async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { user_name: req.body.username },

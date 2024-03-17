@@ -181,11 +181,11 @@ export interface Type {
 // Converts JSON strings to/from your types
 // and asserts the results of JSON.parse at runtime
 export class Convert {
-    public static toWelcome(json: string): Welcome {
+    public static toWelcome(json: string): IPokemon {
         return cast(JSON.parse(json), r("Welcome"));
     }
 
-    public static welcomeToJson(value: Welcome): string {
+    public static welcomeToJson(value: IPokemon): string {
         return JSON.stringify(uncast(value, r("Welcome")), null, 2);
     }
 }

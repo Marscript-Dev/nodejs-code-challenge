@@ -1,7 +1,7 @@
 
 export interface IPokemon {
+    user_pokemon_id: number,
     pokemon_id: number,
     pokemon_name: string,
-    type_id: number,
     user_id: number,
 }
