@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  Id                Int       @id @unique @default(autoincrement())
+  Name              String    @db.VarChar(50)
+  Email             String    @db.VarChar(50) @unique
+  Password          String    @db.VarChar(250)
+  CreationDate      DateTime? @updatedAt
+  Pokemons          Pokemon[]
+  Favorites         Favorite[]
+  @@map("Users")
+}
+model Pokemon {  
+  Id                Int       @id @unique @default(autoincrement())
+  PokemonId         Int       
+  UserId            Int
+  Name              String    @db.VarChar(50)
+  Games             String
+  Abilities         String
+  UpdatedDate       DateTime  @updatedAt
+  CreationDate      DateTime  @default(now())
+  User              User      @relation(fields: [UserId ], references: [Id])
+  Favorites         Favorite[]
+  PokemonType       PokemonType[]
+  @@unique([PokemonId, UserId])
+  @@map("Pokemons")
+}
+model PokemonType {    
+  PokemonId     Int
+  TypeId        Int  
+  CreationDate  DateTime  @default(now())
+  Pokemon       Pokemon   @relation( fields: [PokemonId ], references: [Id])
+  Type          Type      @relation( fields: [TypeId], references: [Id])
+  @@map("PokemonsType")
+  @@id([PokemonId, TypeId])
+  @@unique([PokemonId, TypeId])
+}
+model Type {
+  Id                Int       @id @unique @default(autoincrement())
+  Name              String    @db.VarChar(50) @unique
+  CreationDate      DateTime  @default(now())
+  PokemonType       PokemonType[]
+  @@map("Types")
+}
+model Favorite {    
+  UserId            Int
+  PokemonId         Int
+  CreationDate      DateTime  @updatedAt
+  Pokemon           Pokemon   @relation( fields: [PokemonId], references: [Id])
+  User              User      @relation( fields: [UserId], references: [Id])
+  @@id(name: "FavoriteId",[PokemonId, UserId])
+  @@map("Favorites")
+}
